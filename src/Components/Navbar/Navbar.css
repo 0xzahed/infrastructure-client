@@ -1,0 +1,26 @@
+.site-title {
+  color: black;
+}
+
+.nav-link {
+  color: rgba(0, 0, 0, 0.9);
+  font-size: 14px;
+  font-weight: 550;
+  text-transform: uppercase;
+  line-height: 19px;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+  color: var(--color-primary);
+  background: none;
+  transform: scale(1.05);
+}
+
+.nav-link.active {
+  color: var(--color-primary);
+  font-weight: bold;
+  border-bottom: 2px solid;
+  border-color: var(--color-primary);
+  padding-bottom: 2px;
+}
