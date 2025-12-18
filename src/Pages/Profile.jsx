@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
 import {
   HiMail,
@@ -9,7 +10,6 @@ import {
   HiCheck,
   HiPhone,
 } from "react-icons/hi";
-import { userAPI, dashboardAPI } from "../Services/api";
 import { updateProfile } from "firebase/auth";
 import Loader from "../Components/Loader/Loader";
 
@@ -43,7 +43,13 @@ const Profile = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await dashboardAPI.getStats();
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get(
+        "http://localhost:3000/dashboard/stats",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setStats({
         totalIssues: response.data.totalIssues || 0,
         resolvedIssues: response.data.resolvedIssues || 0,
@@ -87,11 +93,19 @@ const Profile = () => {
         displayName: formData.displayName,
         photoURL: formData.photoURL || user.photoURL,
       });
-      await userAPI.updateUser(user.email, {
-        displayName: formData.displayName,
-        phoneNumber: formData.phoneNumber,
-        photoURL: formData.photoURL,
-      });
+
+      const token = localStorage.getItem("authToken");
+      await axios.patch(
+        `http://localhost:3000/users/${user.email}`,
+        {
+          displayName: formData.displayName,
+          phoneNumber: formData.phoneNumber,
+          photoURL: formData.photoURL,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
@@ -238,7 +252,6 @@ const Profile = () => {
                 </div>
               </div>
             ) : (
-
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   {user?.displayName || "Anonymous User"}

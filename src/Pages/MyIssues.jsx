@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../Context/AuthContext";
-import { issueAPI, dashboardAPI } from "../Services/api";
 import {
   HiLocationMarker,
   HiCalendar,
@@ -33,13 +33,20 @@ const MyIssues = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const params = filter ? { status: filter } : {};
+      const token = localStorage.getItem("authToken");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const queryParams = new URLSearchParams();
+      if (filter) queryParams.append("status", filter);
+
       const [issuesRes, statsRes] = await Promise.all([
-        issueAPI.getMyIssues(params),
-        dashboardAPI.getStats(),
+        axios.get(`http://localhost:3000/issues/my-issues?${queryParams}`, {
+          headers,
+        }),
+        axios.get("http://localhost:3000/dashboard/stats", { headers }),
       ]);
 
-      setIssues(issuesRes.data);
+      setIssues(issuesRes.data.issues || issuesRes.data);
       setStats(statsRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -241,8 +248,8 @@ const MyIssues = () => {
 
                   {issue.priority === "High" && issue.isBoosted && (
                     <div className="mb-3">
-                      <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
-                        🔥 High Priority
+                      <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                        <HiFire className="w-4 h-4" /> High Priority
                       </span>
                     </div>
                   )}
@@ -281,7 +288,7 @@ const MyIssues = () => {
           </div>
         ) : (
           <div className="text-center py-16 bg-white rounded-lg shadow-sm">
-            <div className="text-6xl mb-4">📝</div>
+            <HiDocumentText className="text-6xl mx-auto mb-4 text-gray-400" />
             <h3 className="text-2xl font-semibold text-gray-900 mb-2">
               No Issues Found
             </h3>

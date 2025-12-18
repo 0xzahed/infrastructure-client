@@ -10,16 +10,15 @@ import {
   HiCurrencyDollar,
   HiStar,
   HiLightningBolt,
-  HiShieldCheck,
 } from "react-icons/hi";
 import {
-  MdRoad,
-  MdElectricalServices,
-  MdWaterDrop,
-  MdDelete,
-  MdWaves,
-  MdLightbulb,
-} from "react-icons/md";
+  FaRoad,
+  FaBolt,
+  FaWater,
+  FaTrash,
+  FaTint,
+  FaLightbulb,
+} from "react-icons/fa";
 import { useAuth } from "../Context/AuthContext";
 
 const STEPS_DATA = [
@@ -80,8 +79,7 @@ const FEATURES_DATA = [
   },
   {
     title: "Priority Boost",
-    description:
-      "Boost important issues to high priority for faster attention",
+    description: "Boost important issues to high priority for faster attention",
     icon: HiLightningBolt,
   },
   {
@@ -94,32 +92,32 @@ const FEATURES_DATA = [
 const CATEGORIES_DATA = [
   {
     name: "Road Issues",
-    icon: MdRoad,
+    icon: FaRoad,
     examples: "Potholes, cracks, damaged roads",
   },
   {
     name: "Electricity",
-    icon: MdElectricalServices,
+    icon: FaBolt,
     examples: "Power outages, damaged poles",
   },
   {
     name: "Water Supply",
-    icon: MdWaterDrop,
+    icon: FaWater,
     examples: "Leakages, supply issues",
   },
   {
     name: "Waste Management",
-    icon: MdDelete,
+    icon: FaTrash,
     examples: "Garbage collection, cleanliness",
   },
   {
     name: "Drainage",
-    icon: MdWaves,
+    icon: FaTint,
     examples: "Blocked drains, flooding",
   },
   {
     name: "Street Lights",
-    icon: MdLightbulb,
+    icon: FaLightbulb,
     examples: "Broken lights, dark areas",
   },
 ];

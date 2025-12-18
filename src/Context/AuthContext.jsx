@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -9,7 +10,6 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../Firebase/Firebase.config";
-import { userAPI } from "../Services/api";
 
 const AuthContext = createContext();
 
@@ -39,13 +39,15 @@ export const AuthProvider = ({ children }) => {
   const createUserInBackend = async (firebaseUser, phone = null) => {
     const userData = {
       email: firebaseUser.email,
-      displayName:
-        firebaseUser.displayName || firebaseUser.email.split("@")[0],
+      displayName: firebaseUser.displayName || firebaseUser.email.split("@")[0],
       photoURL: firebaseUser.photoURL || null,
       phoneNumber: phone || firebaseUser.phoneNumber || null,
     };
 
-    await userAPI.createUser(userData);
+    const token = localStorage.getItem("authToken");
+    await axios.post("http://localhost:3000/users", userData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   };
 
   const register = async (email, password, name, phone) => {
@@ -108,7 +110,7 @@ export const AuthProvider = ({ children }) => {
       tokenRefreshInterval = setInterval(async () => {
         const token = await user.getIdToken(true);
         localStorage.setItem("authToken", token);
-      }, 50 * 60 * 1000); 
+      }, 50 * 60 * 1000);
     }
 
     return () => {
@@ -122,8 +124,34 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         await storeAuthToken(currentUser);
+
+        // Fetch user data from backend including role
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await axios.get(
+            `http://localhost:3000/users/${currentUser.email}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          // Merge Firebase user with backend user data (role, isPremium, isBlocked)
+          const userData = {
+            ...currentUser,
+            role: response.data.role || "citizen",
+            isPremium: response.data.isPremium || false,
+            isBlocked: response.data.isBlocked || false,
+            phoneNumber: response.data.phoneNumber || currentUser.phoneNumber,
+          };
+
+          setUser(userData);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setUser(currentUser);
+        }
+      } else {
+        setUser(null);
       }
-      setUser(currentUser);
       setLoading(false);
     });
 

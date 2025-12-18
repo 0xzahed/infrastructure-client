@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { HiLocationMarker, HiPhone, HiMail } from "react-icons/hi";
+import {
+  HiLocationMarker,
+  HiPhone,
+  HiMail,
+  HiPaperAirplane,
+} from "react-icons/hi";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -18,14 +23,12 @@ const Contact = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-
   };
 
   return (
     <div className="mt-16 bg-[#FAF6F3] py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-
           <div className="relative h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
             <img
               src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800"
@@ -140,19 +143,7 @@ const Contact = () => {
                 }
               >
                 Send Message
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  />
-                </svg>
+                <HiPaperAirplane className="w-5 h-5" />
               </button>
             </form>
           </div>

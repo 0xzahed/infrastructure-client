@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router";
-import { issueAPI } from "../Services/api";
 import { useAuth } from "../Context/AuthContext";
 import {
   HiLocationMarker,
@@ -27,7 +27,10 @@ const IssueDetails = () => {
   const fetchIssueDetails = async () => {
     try {
       setLoading(true);
-      const response = await issueAPI.getIssueById(id);
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get(`http://localhost:3000/issues/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setIssue(response.data);
     } catch (error) {
       console.error("Error fetching issue:", error);
@@ -39,7 +42,14 @@ const IssueDetails = () => {
 
   const handleUpvote = async () => {
     try {
-      await issueAPI.upvoteIssue(id);
+      const token = localStorage.getItem("authToken");
+      await axios.post(
+        `http://localhost:3000/issues/${id}/upvote`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchIssueDetails();
     } catch (error) {
       alert(
@@ -57,7 +67,14 @@ const IssueDetails = () => {
       return;
     }
     try {
-      await issueAPI.boostIssue(id);
+      const token = localStorage.getItem("authToken");
+      await axios.post(
+        `http://localhost:3000/issues/${id}/boost`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       alert("Issue boosted to high priority!");
       fetchIssueDetails();
     } catch (error) {
@@ -70,7 +87,10 @@ const IssueDetails = () => {
       return;
     }
     try {
-      await issueAPI.deleteIssue(id);
+      const token = localStorage.getItem("authToken");
+      await axios.delete(`http://localhost:3000/issues/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       alert("Issue deleted successfully");
       navigate("/all-issues");
     } catch (error) {
@@ -179,8 +199,8 @@ const IssueDetails = () => {
                     {issue.status}
                   </span>
                   {issue.priority === "High" && issue.isBoosted && (
-                    <span className="px-4 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
-                      🔥 High Priority
+                    <span className="px-4 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold flex items-center gap-1 w-fit">
+                      <HiFire className="w-4 h-4" /> High Priority
                     </span>
                   )}
                 </div>
@@ -307,7 +327,7 @@ const IssueDetails = () => {
                   style={{ backgroundColor: "var(--color-primary)" }}
                   className="flex items-center gap-2 px-6 py-3 text-white rounded-lg hover:bg-black transition-colors font-semibold"
                 >
-                  🚀 Boost to High Priority
+                  <HiFlag className="w-5 h-5" /> Boost to High Priority
                 </button>
               )}
             </div>

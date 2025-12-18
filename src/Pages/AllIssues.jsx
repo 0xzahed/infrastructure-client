@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { issueAPI } from "../Services/api";
+import axios from "axios";
 import { Link } from "react-router";
-import { HiLocationMarker, HiArrowUp, HiFilter } from "react-icons/hi";
+import {
+  HiLocationMarker,
+  HiArrowUp,
+  HiFilter,
+  HiFire,
+  HiSearch,
+} from "react-icons/hi";
 import Loader from "../Components/Loader/Loader";
 
 const AllIssues = () => {
@@ -21,7 +27,11 @@ const AllIssues = () => {
   const fetchIssues = async () => {
     try {
       setLoading(true);
-      const response = await issueAPI.getAllIssues(filters);
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get("http://localhost:3000/issues", {
+        params: filters,
+        headers: token ? { authorization: `Bearer ${token}` } : {},
+      });
       setIssues(response.data);
     } catch (error) {
       console.error("Error fetching issues:", error);
@@ -34,9 +44,15 @@ const AllIssues = () => {
     e.preventDefault();
     e.stopPropagation();
     try {
-      await issueAPI.upvoteIssue(issueId);
-      fetchIssues(); 
+      const token = localStorage.getItem("authToken");
+      await axios.post(
+        `http://localhost:3000/issues/${issueId}/upvote`,
+        {},
+        { headers: { authorization: `Bearer ${token}` } }
+      );
+      fetchIssues();
     } catch (error) {
+      console.error("Error upvoting issue:", error);
       alert(
         error.response?.data?.message || "Failed to upvote. Please login first."
       );
@@ -145,7 +161,7 @@ const AllIssues = () => {
           </select>
         </div>
       </div>
-      
+
       <div className="mb-4">
         <p className="text-gray-600">
           Showing{" "}
@@ -191,8 +207,8 @@ const AllIssues = () => {
 
                 {issue.priority === "High" && issue.isBoosted && (
                   <div className="mb-3">
-                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
-                      🔥 High Priority
+                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                      <HiFire className="w-4 h-4" /> High Priority
                     </span>
                   </div>
                 )}
@@ -229,7 +245,7 @@ const AllIssues = () => {
         </div>
       ) : (
         <div className="text-center py-16 bg-white rounded-lg shadow-sm">
-          <div className="text-6xl mb-4">🔍</div>
+          <HiSearch className="text-6xl mx-auto mb-4 text-gray-400" />
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">
             No Issues Found
           </h3>

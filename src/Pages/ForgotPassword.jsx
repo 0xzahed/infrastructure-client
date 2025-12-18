@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
-import { HiMail, HiArrowLeft } from "react-icons/hi";
+import { HiMail, HiArrowLeft, HiCheckCircle } from "react-icons/hi";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -36,19 +36,7 @@ const ForgotPassword = () => {
       {submitted ? (
         <div className="space-y-6">
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-4 rounded-lg text-center">
-            <svg
-              className="w-12 h-12 mx-auto mb-3 text-green-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <HiCheckCircle className="w-12 h-12 mx-auto mb-3 text-green-500" />
             <p className="font-semibold mb-1">Email Sent!</p>
             <p className="text-sm">
               We've sent password reset instructions to <strong>{email}</strong>
@@ -75,7 +63,6 @@ const ForgotPassword = () => {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
-
           <div>
             <label
               htmlFor="email"

@@ -6,12 +6,12 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAX6ZUr1gQZEFkE3mS9hHiOl8-BgF-mDUo",
-  authDomain: "citywatch-6f44b.firebaseapp.com",
-  projectId: "citywatch-6f44b",
-  storageBucket: "citywatch-6f44b.firebasestorage.app",
-  messagingSenderId: "882809481616",
-  appId: "1:882809481616:web:c55da8802b0932873b2b15",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
