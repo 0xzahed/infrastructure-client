@@ -14,7 +14,9 @@ const Stats = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/issues");
+      const response = await axios.get(
+        "https://citywatch-server.vercel.app/issues"
+      );
       const allIssues = response.data;
       setStats({
         totalIssues: allIssues.length,

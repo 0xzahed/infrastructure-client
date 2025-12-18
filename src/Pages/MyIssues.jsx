@@ -8,7 +8,12 @@ import {
   HiArrowUp,
   HiPlus,
   HiFilter,
+  HiDocumentText,
+  HiPencil,
+  HiTrash,
+  HiX,
 } from "react-icons/hi";
+import { HiFire } from "react-icons/hi";
 import Loader from "../Components/Loader/Loader";
 
 const MyIssues = () => {
@@ -23,6 +28,15 @@ const MyIssues = () => {
   });
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingIssue, setEditingIssue] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    location: "",
+    image: "",
+  });
 
   useEffect(() => {
     if (user) {
@@ -40,10 +54,15 @@ const MyIssues = () => {
       if (filter) queryParams.append("status", filter);
 
       const [issuesRes, statsRes] = await Promise.all([
-        axios.get(`http://localhost:3000/issues/my-issues?${queryParams}`, {
+        axios.get(
+          `https://citywatch-server.vercel.app/issues/my-issues?${queryParams}`,
+          {
+            headers,
+          }
+        ),
+        axios.get("https://citywatch-server.vercel.app/dashboard/stats", {
           headers,
         }),
-        axios.get("http://localhost:3000/dashboard/stats", { headers }),
       ]);
 
       setIssues(issuesRes.data.issues || issuesRes.data);
@@ -52,6 +71,58 @@ const MyIssues = () => {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (issue, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingIssue(issue);
+    setEditFormData({
+      title: issue.title,
+      description: issue.description,
+      category: issue.category,
+      location: issue.location,
+      image: issue.image,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.patch(
+        `https://citywatch-server.vercel.app/issues/${editingIssue._id}`,
+        editFormData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Issue updated successfully!");
+      setShowEditModal(false);
+      fetchData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to update issue");
+    }
+  };
+
+  const handleDelete = async (issueId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this issue?")) {
+      return;
+    }
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.delete(
+        `https://citywatch-server.vercel.app/issues/${issueId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("Issue deleted successfully!");
+      fetchData();
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to delete issue");
     }
   };
 
@@ -215,9 +286,8 @@ const MyIssues = () => {
         {issues.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {issues.map((issue) => (
-              <Link
+              <div
                 key={issue._id}
-                to={`/issues/${issue._id}`}
                 className="bg-white rounded-lg shadow-sm border-t-4 border-[var(--color-primary)] hover:shadow-lg transition-all duration-300 overflow-hidden"
               >
                 {issue.image && (
@@ -267,7 +337,7 @@ const MyIssues = () => {
                     <span className="truncate">{issue.location}</span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 mb-4">
                     <div className="flex items-center gap-2 text-gray-700">
                       <HiArrowUp className="w-5 h-5" />
                       <span className="font-semibold">
@@ -282,8 +352,36 @@ const MyIssues = () => {
                       </span>
                     </div>
                   </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    <Link
+                      to={`/issues/${issue._id}`}
+                      className="flex-1 text-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                    >
+                      View Details
+                    </Link>
+                    {issue.status === "Pending" && (
+                      <>
+                        <button
+                          onClick={(e) => handleEdit(issue, e)}
+                          className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors"
+                          title="Edit Issue"
+                        >
+                          <HiPencil className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(issue._id, e)}
+                          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                          title="Delete Issue"
+                        >
+                          <HiTrash className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (
@@ -305,6 +403,136 @@ const MyIssues = () => {
               <HiPlus className="w-5 h-5" />
               Report Your First Issue
             </Link>
+          </div>
+        )}
+
+        {/* Edit Issue Modal */}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-2xl font-bold">Edit Issue</h2>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <HiX className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.title}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        title: e.target.value,
+                      })
+                    }
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description *
+                  </label>
+                  <textarea
+                    value={editFormData.description}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        description: e.target.value,
+                      })
+                    }
+                    required
+                    rows="5"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category *
+                  </label>
+                  <select
+                    value={editFormData.category}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        category: e.target.value,
+                      })
+                    }
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  >
+                    <option value="Road">Road & Infrastructure</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Water">Water Supply</option>
+                    <option value="Waste">Waste Management</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    value={editFormData.location}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        location: e.target.value,
+                      })
+                    }
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Image URL
+                  </label>
+                  <input
+                    type="url"
+                    value={editFormData.image}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        image: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    style={{ backgroundColor: "var(--color-primary)" }}
+                    className="flex-1 px-6 py-3 text-white rounded-lg hover:bg-black transition-colors font-semibold"
+                  >
+                    Update Issue
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(false)}
+                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

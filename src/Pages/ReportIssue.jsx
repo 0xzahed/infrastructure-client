@@ -7,6 +7,8 @@ import {
   HiLocationMarker,
   HiDocumentText,
   HiTag,
+  HiInformationCircle,
+  HiXCircle,
 } from "react-icons/hi";
 import Loader from "../Components/Loader/Loader";
 
@@ -65,7 +67,7 @@ const ReportIssue = () => {
       console.log("Submitting issue:", formData);
       const token = localStorage.getItem("authToken");
       const response = await axios.post(
-        "http://localhost:3000/issues",
+        "https://citywatch-server.vercel.app/issues",
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },

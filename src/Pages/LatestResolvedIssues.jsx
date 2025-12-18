@@ -15,7 +15,7 @@ const LatestResolvedIssues = () => {
   const fetchLatestResolvedIssues = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/issues/latest-resolved"
+        "https://citywatch-server.vercel.app/issues/latest-resolved"
       );
       setIssues(response.data);
     } catch (error) {

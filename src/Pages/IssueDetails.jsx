@@ -28,9 +28,12 @@ const IssueDetails = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
-      const response = await axios.get(`http://localhost:3000/issues/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `https://citywatch-server.vercel.app/issues/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setIssue(response.data);
     } catch (error) {
       console.error("Error fetching issue:", error);
@@ -41,10 +44,14 @@ const IssueDetails = () => {
   };
 
   const handleUpvote = async () => {
+    if (user?.isBlocked) {
+      alert("Your account is blocked. Please contact authorities.");
+      return;
+    }
     try {
       const token = localStorage.getItem("authToken");
       await axios.post(
-        `http://localhost:3000/issues/${id}/upvote`,
+        `https://citywatch-server.vercel.app/issues/${id}/upvote`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -59,6 +66,10 @@ const IssueDetails = () => {
   };
 
   const handleBoost = async () => {
+    if (user?.isBlocked) {
+      alert("Your account is blocked. Please contact authorities.");
+      return;
+    }
     if (
       !window.confirm(
         "Boost this issue to high priority? This will require payment."
@@ -69,7 +80,7 @@ const IssueDetails = () => {
     try {
       const token = localStorage.getItem("authToken");
       await axios.post(
-        `http://localhost:3000/issues/${id}/boost`,
+        `https://citywatch-server.vercel.app/issues/${id}/boost`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -88,7 +99,7 @@ const IssueDetails = () => {
     }
     try {
       const token = localStorage.getItem("authToken");
-      await axios.delete(`http://localhost:3000/issues/${id}`, {
+      await axios.delete(`https://citywatch-server.vercel.app/issues/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("Issue deleted successfully");
@@ -261,6 +272,39 @@ const IssueDetails = () => {
                 {issue.citizenName || "Anonymous Citizen"}
               </p>
             </div>
+
+            {/* Staff Information Section */}
+            {issue.assignedStaff && (
+              <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Assigned Staff
+                </h3>
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {issue.assignedStaffName?.charAt(0).toUpperCase() || "S"}
+                  </div>
+                  <div>
+                    <p className="text-gray-900 font-medium">
+                      {issue.assignedStaffName || issue.assignedStaff}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {issue.assignedStaff}
+                    </p>
+                  </div>
+                </div>
+                {issue.assignedAt && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Assigned on{" "}
+                    {new Date(issue.assignedAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                )}
+              </div>
+            )}
+
             {issue.timeline && issue.timeline.length > 0 && (
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">

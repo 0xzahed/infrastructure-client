@@ -3,6 +3,7 @@ import Root from "../Root/Root";
 import AuthLayout from "../Auth/AuthLayout";
 import PrivateRoute from "./PrivateRoute";
 import AdminRoute from "./AdminRoute";
+import StaffRoute from "./StaffRoute";
 import Home from "../Pages/Home";
 import Contact from "../Pages/Contact";
 import About from "../Pages/About";
@@ -23,6 +24,11 @@ import AdminAllIssues from "../Pages/Admin/AdminAllIssues";
 import ManageUsers from "../Pages/Admin/ManageUsers";
 import ManageStaff from "../Pages/Admin/ManageStaff";
 import AdminPayments from "../Pages/Admin/AdminPayments";
+
+// Staff Pages
+import StaffDashboard from "../Pages/Staff/StaffDashboard";
+import StaffAssignedIssues from "../Pages/Staff/StaffAssignedIssues";
+import StaffProfile from "../Pages/Staff/StaffProfile";
 
 export const router = createBrowserRouter([
   {
@@ -70,8 +76,8 @@ export const router = createBrowserRouter([
         Component: About,
       },
       {
-        path: "test-auth",
-        Compone: (
+        path: "profile",
+        element: (
           <PrivateRoute>
             <Profile />
           </PrivateRoute>
@@ -129,6 +135,36 @@ export const router = createBrowserRouter([
           <AdminRoute>
             <Profile />
           </AdminRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/staff",
+    Component: Root,
+    children: [
+      {
+        path: "dashboard",
+        element: (
+          <StaffRoute>
+            <StaffDashboard />
+          </StaffRoute>
+        ),
+      },
+      {
+        path: "assigned-issues",
+        element: (
+          <StaffRoute>
+            <StaffAssignedIssues />
+          </StaffRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <StaffRoute>
+            <StaffProfile />
+          </StaffRoute>
         ),
       },
     ],

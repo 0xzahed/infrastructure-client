@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { HiMail, HiLockClosed } from "react-icons/hi";
 import { FcGoogle } from "react-icons/fc";
@@ -12,8 +12,26 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login, googleSignIn } = useAuth();
+  // authLoading is the global auth context loading; loading is local form state
+  const { login, googleSignIn, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  // Navigate based on user role after login
+  useEffect(() => {
+    if (user && !authLoading) {
+      const role = user.role || "citizen";
+      
+      if (role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (role === "staff") {
+        navigate("/staff/dashboard");
+      } else {
+        navigate("/my-issues");
+      }
+      // Clear local loading state once navigation decision is made
+      setLoading(false);
+    }
+  }, [user, authLoading, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -29,7 +47,7 @@ const Login = () => {
 
     try {
       await login(formData.email, formData.password);
-      navigate("/");
+      // Navigation will be handled by useEffect when user role is loaded
     } catch (error) {
       console.error("Login error:", error);
       if (error.code === "auth/invalid-credential") {
@@ -43,7 +61,6 @@ const Login = () => {
       } else {
         setError("Failed to sign in. Please try again");
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -54,7 +71,7 @@ const Login = () => {
 
     try {
       await googleSignIn();
-      navigate("/");
+      // Navigation will be handled by useEffect when user role is loaded
     } catch (error) {
       console.error("Google sign-in error:", error);
       if (error.code === "auth/popup-closed-by-user") {
@@ -64,7 +81,6 @@ const Login = () => {
       } else {
         setError("Failed to sign in with Google. Please try again");
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -157,11 +173,11 @@ const Login = () => {
         </div>
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || authLoading}
           style={{ backgroundColor: "var(--color-primary)" }}
           className="w-full py-3 text-white rounded-lg hover:bg-black transition-colors font-semibold uppercase disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "Signing In..." : "Sign In"}
+          {loading || authLoading ? "Signing In..." : "Sign In"}
         </button>
       </form>
       <div className="mt-6">
@@ -180,7 +196,7 @@ const Login = () => {
         <button
           type="button"
           onClick={handleGoogleSignIn}
-          disabled={loading}
+          disabled={loading || authLoading}
           className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FcGoogle className="text-2xl" />

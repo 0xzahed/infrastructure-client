@@ -122,23 +122,60 @@ const Navbar = () => {
                     </div>
 
                     {/* Menu Items */}
-                    <Link
-                      to="/my-issues"
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      <HiUser className="w-5 h-5" />
-                      <span>My Issues</span>
-                    </Link>
+                    {user?.role === "admin" && (
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <HiUser className="w-5 h-5" />
+                        <span>Admin Dashboard</span>
+                      </Link>
+                    )}
 
-                    <Link
-                      to="/profile"
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      <HiUser className="w-5 h-5" />
-                      <span>My Profile</span>
-                    </Link>
+                    {user?.role === "staff" && (
+                      <Link
+                        to="/staff/dashboard"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <HiUser className="w-5 h-5" />
+                        <span>Staff Dashboard</span>
+                      </Link>
+                    )}
+
+                    {(!user?.role || user?.role === "citizen") && (
+                      <>
+                        <Link
+                          to="/my-issues"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <HiUser className="w-5 h-5" />
+                          <span>My Issues</span>
+                        </Link>
+
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <HiUser className="w-5 h-5" />
+                          <span>My Profile</span>
+                        </Link>
+                      </>
+                    )}
+
+                    {(user?.role === "admin" || user?.role === "staff") && (
+                      <Link
+                        to={`/${user.role}/profile`}
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+                      >
+                        <HiUser className="w-5 h-5" />
+                        <span>My Profile</span>
+                      </Link>
+                    )}
 
                     <button
                       onClick={handleLogout}

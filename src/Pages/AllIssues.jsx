@@ -28,10 +28,13 @@ const AllIssues = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("authToken");
-      const response = await axios.get("http://localhost:3000/issues", {
-        params: filters,
-        headers: token ? { authorization: `Bearer ${token}` } : {},
-      });
+      const response = await axios.get(
+        "https://citywatch-server.vercel.app/issues",
+        {
+          params: filters,
+          headers: token ? { authorization: `Bearer ${token}` } : {},
+        }
+      );
       setIssues(response.data);
     } catch (error) {
       console.error("Error fetching issues:", error);
@@ -46,7 +49,7 @@ const AllIssues = () => {
     try {
       const token = localStorage.getItem("authToken");
       await axios.post(
-        `http://localhost:3000/issues/${issueId}/upvote`,
+        `https://citywatch-server.vercel.app/issues/${issueId}/upvote`,
         {},
         { headers: { authorization: `Bearer ${token}` } }
       );

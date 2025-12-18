@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const token = localStorage.getItem("authToken");
-    await axios.post("http://localhost:3000/users", userData, {
+    await axios.post("https://citywatch-server.vercel.app/users", userData, {
       headers: { Authorization: `Bearer ${token}` },
     });
   };
@@ -61,7 +61,6 @@ export const AuthProvider = ({ children }) => {
       displayName: name,
     });
 
-    // Store token
     await storeAuthToken(userCredential.user);
 
     await createUserInBackend(userCredential.user, phone);
@@ -73,14 +72,18 @@ export const AuthProvider = ({ children }) => {
   // Login user
   const login = async (email, password) => {
     setLoading(true);
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    await storeAuthToken(userCredential.user);
-    setLoading(false);
-    return userCredential.user;
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await storeAuthToken(userCredential.user);
+      return userCredential.user;
+    } catch (error) {
+      setLoading(false);
+      throw error;
+    }
   };
 
   // Logout user
@@ -94,13 +97,17 @@ export const AuthProvider = ({ children }) => {
   // Google Sign In
   const googleSignIn = async () => {
     setLoading(true);
-    const result = await signInWithPopup(auth, googleProvider);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
 
-    await storeAuthToken(result.user);
-    await createUserInBackend(result.user);
+      await storeAuthToken(result.user);
+      await createUserInBackend(result.user);
 
-    setLoading(false);
-    return result.user;
+      return result.user;
+    } catch (error) {
+      setLoading(false);
+      throw error;
+    }
   };
 
   useEffect(() => {
@@ -127,9 +134,10 @@ export const AuthProvider = ({ children }) => {
 
         // Fetch user data from backend including role
         try {
-          const token = localStorage.getItem("authToken");
+          // Get fresh token directly from Firebase user
+          const token = await currentUser.getIdToken();
           const response = await axios.get(
-            `http://localhost:3000/users/${currentUser.email}`,
+            `https://citywatch-server.vercel.app/users/${currentUser.email}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
