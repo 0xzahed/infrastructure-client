@@ -20,7 +20,7 @@ const Login = () => {
   useEffect(() => {
     if (user && !authLoading) {
       const role = user.role || "citizen";
-      
+
       if (role === "admin") {
         navigate("/admin/dashboard");
       } else if (role === "staff") {
