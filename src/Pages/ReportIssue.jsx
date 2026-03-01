@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { useAuth } from "../Context/AuthContext";
+import toast from "react-hot-toast";
 import {
   HiCamera,
   HiLocationMarker,
@@ -18,6 +19,9 @@ const ReportIssue = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [userStats, setUserStats] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -62,6 +66,38 @@ const ReportIssue = () => {
     setError("");
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size must be less than 5MB");
+      return;
+    }
+
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setError("");
+  };
+
+  const uploadImageToImgBB = async (file) => {
+    const apiKey = import.meta.env.VITE_IMGBB_API_KEY;
+    const formDataImg = new FormData();
+    formDataImg.append("image", file);
+
+    const response = await axios.post(
+      `https://api.imgbb.com/1/upload?key=${apiKey}`,
+      formDataImg
+    );
+    return response.data.data.url;
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview("");
+    setFormData({ ...formData, image: "" });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -84,18 +120,31 @@ const ReportIssue = () => {
       setLoading(true);
       setError("");
 
-      console.log("Submitting issue:", formData);
+      let imageUrl = formData.image;
+      if (imageFile) {
+        setImageUploading(true);
+        imageUrl = await uploadImageToImgBB(imageFile);
+        setImageUploading(false);
+      }
+
+      const issueData = {
+        ...formData,
+        image: imageUrl,
+        userEmail: user.email,
+        userName: user.displayName || user.email,
+      };
+      console.log("Submitting issue:", issueData);
       const token = localStorage.getItem("authToken");
       const response = await axios.post(
         "https://citywatch-server.vercel.app/issues",
-        formData,
+        issueData,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       console.log("Issue created:", response);
 
-      alert("Issue reported successfully!");
+      toast.success("Issue reported successfully!");
       navigate("/my-issues");
     } catch (error) {
       console.error("Error creating issue:", error);
@@ -154,10 +203,10 @@ const ReportIssue = () => {
 
   return (
     <div className="mt-20 bg-gray-50 min-h-screen py-12">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
             Report an{" "}
             <span style={{ color: "var(--color-primary)" }}>Issue</span>
           </h1>
@@ -309,44 +358,52 @@ const ReportIssue = () => {
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                   <HiCamera className="w-5 h-5 text-[var(--color-primary)]" />
-                  Photo URL (Optional)
+                  Photo (Optional)
                 </label>
-                <input
-                  type="url"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  Provide an image URL to help illustrate the issue
-                </p>
+
+                {!imagePreview ? (
+                  <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[var(--color-primary)] hover:bg-gray-50 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <HiCamera className="w-10 h-10 text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-500">
+                        <span className="font-semibold text-[var(--color-primary)]">Click to upload</span> or drag & drop
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">PNG, JPG, WEBP up to 5MB</p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                ) : (
+                  <div className="relative border border-gray-300 rounded-lg overflow-hidden">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full max-h-64 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                    >
+                      <HiXCircle className="w-5 h-5" />
+                    </button>
+                    <p className="text-xs text-gray-500 p-2 bg-gray-50">{imageFile?.name}</p>
+                  </div>
+                )}
               </div>
-              {formData.image && (
-                <div className="border border-gray-300 rounded-lg p-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">
-                    Image Preview:
-                  </p>
-                  <img
-                    src={formData.image}
-                    alt="Preview"
-                    className="w-full max-h-64 object-cover rounded-lg"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                  />
-                </div>
-              )}
             </div>
             <div className="flex gap-4 mt-8">
               <button
                 type="submit"
                 style={{ backgroundColor: "var(--color-primary)" }}
                 className="flex-1 px-6 py-3 text-white rounded-lg hover:bg-black transition-colors font-semibold text-lg"
-                disabled={loading}
+                disabled={loading || imageUploading}
               >
-                {loading ? "Submitting..." : "Report Issue"}
+                {imageUploading ? "Uploading image..." : loading ? "Submitting..." : "Report Issue"}
               </button>
               <button
                 type="button"

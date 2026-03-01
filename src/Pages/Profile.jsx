@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
 import { auth } from "../Firebase/Firebase.config";
+import toast from "react-hot-toast";
 import {
   HiMail,
   HiUser,
@@ -57,7 +58,7 @@ const Profile = () => {
       setClientSecret(response.data.clientSecret);
     } catch (error) {
       console.error("Payment intent error:", error);
-      alert(
+      toast.error(
         error.response?.data?.message ||
           "Failed to initialize payment. Check console for details."
       );
@@ -66,7 +67,7 @@ const Profile = () => {
   };
 
   const handlePaymentSuccess = () => {
-    alert("🎉 Successfully upgraded to Premium!");
+    toast.success("Successfully upgraded to Premium!");
     setShowPaymentModal(false);
     window.location.reload();
   };
@@ -207,7 +208,7 @@ const Profile = () => {
 
   return (
     <div className="mt-16 bg-[#FAF6F3] min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div
             style={{ backgroundColor: "var(--color-primary)" }}

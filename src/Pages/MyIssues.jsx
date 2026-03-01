@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../Context/AuthContext";
+import toast from "react-hot-toast";
 import {
   HiLocationMarker,
   HiCalendar,
@@ -99,11 +100,11 @@ const MyIssues = () => {
         editFormData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("Issue updated successfully!");
+      toast.success("Issue updated successfully!");
       setShowEditModal(false);
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to update issue");
+      toast.error(error.response?.data?.message || "Failed to update issue");
     }
   };
 
@@ -121,10 +122,10 @@ const MyIssues = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert("Issue deleted successfully!");
+      toast.success("Issue deleted successfully!");
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to delete issue");
+      toast.error(error.response?.data?.message || "Failed to delete issue");
     }
   };
 
@@ -184,10 +185,10 @@ const MyIssues = () => {
 
   return (
     <div className="mt-20 bg-gray-50 min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
               My <span style={{ color: "var(--color-primary)" }}>Issues</span>
             </h1>
             <p className="text-gray-600">

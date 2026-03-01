@@ -126,9 +126,10 @@ const AdminPayments = () => {
   );
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Payments</h1>
+    <div className="mt-20 bg-gray-50 min-h-screen py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Payments</h1>
         <div className="bg-white px-6 py-3 rounded-xl shadow-md border-l-4 border-green-500">
           <p className="text-sm text-gray-600">Total Revenue</p>
           <p className="text-2xl font-bold text-green-600">৳{totalRevenue}</p>
@@ -258,6 +259,7 @@ const AdminPayments = () => {
           <p className="text-gray-500">No payments found</p>
         </div>
       )}
+      </div>
     </div>
   );
 };

@@ -157,19 +157,19 @@ const HowItWorks = () => {
     <div className="min-h-screen bg-gray-50 mt-16">
       <div
         style={{ backgroundColor: "var(--color-primary)" }}
-        className="text-white py-20"
+        className="text-white py-16 md:py-20"
       >
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-4">How CityWatch Works</h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">How CityWatch Works</h1>
+          <p className="text-base md:text-xl text-white/90 max-w-2xl mx-auto">
             Making your city better, one report at a time. Learn how our
             platform helps you report and track infrastructure issues.
           </p>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Simple 6-Step Process</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple 6-Step Process</h2>
           <p className="text-gray-600 text-lg">
             Report issues in minutes and make a difference in your community
           </p>
@@ -201,9 +201,9 @@ const HowItWorks = () => {
         </div>
       </div>
       <div className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Issue Categories</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Issue Categories</h2>
             <p className="text-gray-600 text-lg">
               Report issues across various infrastructure categories
             </p>
@@ -226,9 +226,9 @@ const HowItWorks = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Platform Features</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Platform Features</h2>
           <p className="text-gray-600 text-lg">
             Everything you need to report and track issues efficiently
           </p>
@@ -252,9 +252,9 @@ const HowItWorks = () => {
       </div>
 
       <div className="bg-white py-16">
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Frequently Asked Questions
             </h2>
           </div>
@@ -277,8 +277,8 @@ const HowItWorks = () => {
         style={{ backgroundColor: "var(--color-primary)" }}
         className="text-white py-16"
       >
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Make a Difference?
           </h2>
           <p className="text-xl text-white/90 mb-8">

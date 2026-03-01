@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router";
+import toast from "react-hot-toast";
 import {
   HiLocationMarker,
   HiArrowUp,
@@ -56,7 +57,7 @@ const AllIssues = () => {
       fetchIssues();
     } catch (error) {
       console.error("Error upvoting issue:", error);
-      alert(
+      toast.error(
         error.response?.data?.message || "Failed to upvote. Please login first."
       );
     }
@@ -99,9 +100,9 @@ const AllIssues = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 mt-20">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-20">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">
           All <span style={{ color: "var(--color-primary)" }}>Issues</span>
         </h1>
         <p className="text-gray-600">

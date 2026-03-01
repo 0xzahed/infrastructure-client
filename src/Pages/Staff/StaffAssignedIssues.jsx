@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { useAuth } from "../../Context/AuthContext";
 import { HiFilter, HiFire, HiLocationMarker, HiCalendar } from "react-icons/hi";
 import Loader from "../../Components/Loader/Loader";
+import toast from "react-hot-toast";
 
 const StaffAssignedIssues = () => {
   const { user } = useAuth();
@@ -62,10 +63,10 @@ const StaffAssignedIssues = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Status updated successfully!");
+      toast.success("Status updated successfully!");
       fetchIssues();
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to update status");
+      toast.error(error.response?.data?.message || "Failed to update status");
     } finally {
       setChangingStatus({ ...changingStatus, [issueId]: false });
     }
@@ -108,9 +109,9 @@ const StaffAssignedIssues = () => {
 
   return (
     <div className="mt-20 bg-gray-50 min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
             Assigned{" "}
             <span style={{ color: "var(--color-primary)" }}>Issues</span>
           </h1>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router";
 import { useAuth } from "../Context/AuthContext";
+import toast from "react-hot-toast";
 import {
   HiLocationMarker,
   HiCalendar,
@@ -45,7 +46,7 @@ const IssueDetails = () => {
 
   const handleUpvote = async () => {
     if (user?.isBlocked) {
-      alert("Your account is blocked. Please contact authorities.");
+      toast.error("Your account is blocked. Please contact authorities.");
       return;
     }
     try {
@@ -59,7 +60,7 @@ const IssueDetails = () => {
       );
       fetchIssueDetails();
     } catch (error) {
-      alert(
+      toast.error(
         error.response?.data?.message || "Failed to upvote. Please login first."
       );
     }
@@ -67,7 +68,7 @@ const IssueDetails = () => {
 
   const handleBoost = async () => {
     if (user?.isBlocked) {
-      alert("Your account is blocked. Please contact authorities.");
+      toast.error("Your account is blocked. Please contact authorities.");
       return;
     }
     if (
@@ -86,10 +87,10 @@ const IssueDetails = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert("Issue boosted to high priority!");
+      toast.success("Issue boosted to high priority!");
       fetchIssueDetails();
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to boost issue");
+      toast.error(error.response?.data?.message || "Failed to boost issue");
     }
   };
 
@@ -102,10 +103,10 @@ const IssueDetails = () => {
       await axios.delete(`https://citywatch-server.vercel.app/issues/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert("Issue deleted successfully");
+      toast.success("Issue deleted successfully");
       navigate("/all-issues");
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to delete issue");
+      toast.error(error.response?.data?.message || "Failed to delete issue");
     }
   };
 
@@ -169,7 +170,7 @@ const IssueDetails = () => {
 
   return (
     <div className="mt-20 bg-gray-50 min-h-screen py-8">
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
