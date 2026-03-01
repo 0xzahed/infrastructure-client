@@ -143,13 +143,19 @@ export const AuthProvider = ({ children }) => {
             }
           );
 
+          // Support both flat and nested backend responses
+          const backendUser = response.data.user || response.data;
+
           // Merge Firebase user with backend user data (role, isPremium, isBlocked)
           const userData = {
             ...currentUser,
-            role: response.data.role || "citizen",
-            isPremium: response.data.isPremium || false,
-            isBlocked: response.data.isBlocked || false,
-            phoneNumber: response.data.phoneNumber || currentUser.phoneNumber,
+            role: backendUser.role || "citizen",
+            isPremium: backendUser.isPremium || false,
+            isBlocked: backendUser.isBlocked || false,
+            phoneNumber:
+              backendUser.phoneNumber ||
+              backendUser.phone ||
+              currentUser.phoneNumber,
           };
 
           setUser(userData);

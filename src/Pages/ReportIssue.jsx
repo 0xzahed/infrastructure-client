@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { useAuth } from "../Context/AuthContext";
@@ -17,6 +17,7 @@ const ReportIssue = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [userStats, setUserStats] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -33,6 +34,25 @@ const ReportIssue = () => {
     "Drainage",
     "Street Light",
   ];
+
+  useEffect(() => {
+    if (user) {
+      fetchUserStats();
+    }
+  }, [user]);
+
+  const fetchUserStats = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get(
+        `https://citywatch-server.vercel.app/users/${user.email}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUserStats(response.data);
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -163,6 +183,32 @@ const ReportIssue = () => {
           </div>
         </div>
 
+        {/* Limit Reached Warning */}
+        {userStats &&
+          !userStats.isPremium &&
+          userStats.issueReportedThisMonth >= 3 && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-8">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-yellow-800 mb-2">
+                    Limit Reached
+                  </h3>
+                  <p className="text-sm text-yellow-700 mb-4">
+                    You have reported {userStats.issueReportedThisMonth} issues
+                    this month. Upgrade to Premium for unlimited reporting!
+                  </p>
+                  <button
+                    onClick={() => navigate("/profile")}
+                    style={{ backgroundColor: "var(--color-primary)" }}
+                    className="px-6 py-2 text-white rounded-lg hover:bg-black transition-colors font-semibold"
+                  >
+                    Upgrade to Premium
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         {/* Error Message */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
@@ -182,128 +228,136 @@ const ReportIssue = () => {
           onSubmit={handleSubmit}
           className="bg-white rounded-xl shadow-lg p-8"
         >
-          <div className="space-y-6">
-            <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                <HiDocumentText className="w-5 h-5 text-[var(--color-primary)]" />
-                Issue Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="e.g., Large pothole on Main Street"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-                required
-              />
-            </div>
-
-            {/* Category */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                <HiTag className="w-5 h-5 text-[var(--color-primary)]" />
-                Category <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-                required
-              >
-                <option value="">Select a category</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Location */}
-            <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                <HiLocationMarker className="w-5 h-5 text-[var(--color-primary)]" />
-                Location <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder="e.g., Mirpur 1, Dhaka"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                <HiDocumentText className="w-5 h-5 text-[var(--color-primary)]" />
-                Description <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Describe the issue in detail..."
-                rows="6"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent resize-none"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                <HiCamera className="w-5 h-5 text-[var(--color-primary)]" />
-                Photo URL (Optional)
-              </label>
-              <input
-                type="url"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                Provide an image URL to help illustrate the issue
-              </p>
-            </div>
-            {formData.image && (
-              <div className="border border-gray-300 rounded-lg p-4">
-                <p className="text-sm font-semibold text-gray-700 mb-2">
-                  Image Preview:
-                </p>
-                <img
-                  src={formData.image}
-                  alt="Preview"
-                  className="w-full max-h-64 object-cover rounded-lg"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
+          <fieldset
+            disabled={
+              userStats &&
+              !userStats.isPremium &&
+              userStats.issueReportedThisMonth >= 3
+            }
+          >
+            <div className="space-y-6">
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                  <HiDocumentText className="w-5 h-5 text-[var(--color-primary)]" />
+                  Issue Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="e.g., Large pothole on Main Street"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  required
                 />
               </div>
-            )}
-          </div>
-          <div className="flex gap-4 mt-8">
-            <button
-              type="submit"
-              style={{ backgroundColor: "var(--color-primary)" }}
-              className="flex-1 px-6 py-3 text-white rounded-lg hover:bg-black transition-colors font-semibold text-lg"
-              disabled={loading}
-            >
-              {loading ? "Submitting..." : "Report Issue"}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-          </div>
+
+              {/* Category */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                  <HiTag className="w-5 h-5 text-[var(--color-primary)]" />
+                  Category <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                  <HiLocationMarker className="w-5 h-5 text-[var(--color-primary)]" />
+                  Location <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="e.g., Mirpur 1, Dhaka"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                  <HiDocumentText className="w-5 h-5 text-[var(--color-primary)]" />
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Describe the issue in detail..."
+                  rows="6"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent resize-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                  <HiCamera className="w-5 h-5 text-[var(--color-primary)]" />
+                  Photo URL (Optional)
+                </label>
+                <input
+                  type="url"
+                  name="image"
+                  value={formData.image}
+                  onChange={handleChange}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Provide an image URL to help illustrate the issue
+                </p>
+              </div>
+              {formData.image && (
+                <div className="border border-gray-300 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-2">
+                    Image Preview:
+                  </p>
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    className="w-full max-h-64 object-cover rounded-lg"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex gap-4 mt-8">
+              <button
+                type="submit"
+                style={{ backgroundColor: "var(--color-primary)" }}
+                className="flex-1 px-6 py-3 text-white rounded-lg hover:bg-black transition-colors font-semibold text-lg"
+                disabled={loading}
+              >
+                {loading ? "Submitting..." : "Report Issue"}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                disabled={loading}
+              >
+                Cancel
+              </button>
+            </div>
+          </fieldset>
         </form>
       </div>
     </div>

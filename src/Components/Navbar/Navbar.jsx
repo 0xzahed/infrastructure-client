@@ -11,14 +11,44 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const { user, logout } = useAuth();
 
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "All Issues", path: "/all-issues" },
-    { name: "Report Issue", path: "/report-issue" },
-    { name: "How It Works", path: "/how-it-works" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
-  ];
+  // Build nav items based on role
+  const getNavLinks = () => {
+    const baseLinks = [
+      { name: "Home", path: "/" },
+      { name: "All Issues", path: "/all-issues" },
+      { name: "How It Works", path: "/how-it-works" },
+      { name: "About", path: "/about" },
+      { name: "Contact", path: "/contact" },
+    ];
+
+    if (user?.role === "admin") {
+      return [
+        { name: "Dashboard", path: "/admin/dashboard" },
+        { name: "All Issues", path: "/admin/all-issues" },
+        { name: "Manage Users", path: "/admin/manage-users" },
+        { name: "Manage Staff", path: "/admin/manage-staff" },
+        { name: "Payments", path: "/admin/payments" },
+      ];
+    }
+
+    if (user?.role === "staff") {
+      return [
+        { name: "Dashboard", path: "/staff/dashboard" },
+        { name: "Assigned Issues", path: "/staff/assigned-issues" },
+        { name: "Profile", path: "/staff/profile" },
+      ];
+    }
+
+    if (user) {
+      return [
+        ...baseLinks,
+        { name: "Report Issue", path: "/report-issue" },
+        { name: "My Issues", path: "/my-issues" },
+      ];
+    }
+
+    return baseLinks;
+  };
 
   const handleLogout = async () => {
     try {
@@ -70,7 +100,7 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden lg:flex gap-8">
-            {navLinks.map(({ name, path }) => (
+            {getNavLinks().map(({ name, path }) => (
               <NavLink
                 key={path}
                 to={path}
@@ -203,7 +233,7 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="lg:hidden pb-4 pt-2">
             <div className="flex flex-col space-y-2">
-              {navLinks.map(({ name, path }) => (
+              {getNavLinks().map(({ name, path }) => (
                 <NavLink
                   key={path}
                   to={path}

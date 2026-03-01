@@ -28,6 +28,7 @@ const MyIssues = () => {
   });
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingIssue, setEditingIssue] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -42,7 +43,7 @@ const MyIssues = () => {
     if (user) {
       fetchData();
     }
-  }, [user, filter]);
+  }, [user, filter, categoryFilter]);
 
   const fetchData = async () => {
     try {
@@ -52,6 +53,7 @@ const MyIssues = () => {
 
       const queryParams = new URLSearchParams();
       if (filter) queryParams.append("status", filter);
+      if (categoryFilter) queryParams.append("category", categoryFilter);
 
       const [issuesRes, statsRes] = await Promise.all([
         axios.get(
@@ -231,49 +233,74 @@ const MyIssues = () => {
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
           <div className="flex items-center gap-2 mb-4">
             <HiFilter className="text-gray-600" />
-            <h2 className="text-lg font-semibold">Filter by Status</h2>
+            <h2 className="text-lg font-semibold">Filters</h2>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setFilter("")}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === ""
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter("Pending")}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === "Pending"
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Pending
-            </button>
-            <button
-              onClick={() => setFilter("In-Progress")}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === "In-Progress"
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              In Progress
-            </button>
-            <button
-              onClick={() => setFilter("Resolved")}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === "Resolved"
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Resolved
-            </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filter by Status
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setFilter("")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    filter === ""
+                      ? "bg-[var(--color-primary)] text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilter("Pending")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    filter === "Pending"
+                      ? "bg-[var(--color-primary)] text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Pending
+                </button>
+                <button
+                  onClick={() => setFilter("In-Progress")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    filter === "In-Progress"
+                      ? "bg-[var(--color-primary)] text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  In Progress
+                </button>
+                <button
+                  onClick={() => setFilter("Resolved")}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    filter === "Resolved"
+                      ? "bg-[var(--color-primary)] text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Resolved
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filter by Category
+              </label>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none"
+              >
+                <option value="">All Categories</option>
+                <option value="Road">Road</option>
+                <option value="Electricity">Electricity</option>
+                <option value="Water">Water</option>
+                <option value="Waste">Waste</option>
+                <option value="Drainage">Drainage</option>
+                <option value="Street Light">Street Light</option>
+              </select>
+            </div>
           </div>
         </div>
         <div className="mb-4">
@@ -408,8 +435,14 @@ const MyIssues = () => {
 
         {/* Edit Issue Modal */}
         {showEditModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowEditModal(false)}
+            ></div>
+            {/* Modal Content */}
+            <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                 <h2 className="text-2xl font-bold">Edit Issue</h2>
                 <button

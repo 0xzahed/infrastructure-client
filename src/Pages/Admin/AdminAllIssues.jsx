@@ -75,7 +75,7 @@ const AdminAllIssues = () => {
       const token = localStorage.getItem("authToken");
       await axios.patch(
         `https://citywatch-server.vercel.app/admin/issues/${selectedIssue._id}/assign`,
-        { staffId: selectedStaff },
+        { assignedTo: selectedStaff },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -297,8 +297,18 @@ const AdminAllIssues = () => {
 
       {/* Assign Staff Modal */}
       {showAssignModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              setShowAssignModal(false);
+              setSelectedIssue(null);
+              setSelectedStaff("");
+            }}
+          ></div>
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl transform transition-all animate-[fadeIn_0.2s_ease-out]">
             <h2 className="text-2xl font-bold mb-4">Assign Staff</h2>
             <p className="text-gray-600 mb-4">
               Issue:{" "}
@@ -311,7 +321,7 @@ const AdminAllIssues = () => {
             >
               <option value="">Select Staff Member</option>
               {staffList.map((staff) => (
-                <option key={staff._id} value={staff._id}>
+                <option key={staff._id} value={staff.email}>
                   {staff.name} - {staff.email}
                 </option>
               ))}

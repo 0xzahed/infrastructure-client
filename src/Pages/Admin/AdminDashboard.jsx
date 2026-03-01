@@ -317,10 +317,19 @@ const AdminDashboard = () => {
                   />
                   <div className="flex-1">
                     <p className="font-semibold text-gray-800 line-clamp-1">
-                      {user.displayName}
+                      {typeof user.displayName === "object" &&
+                      user.displayName?.name
+                        ? user.displayName.name
+                        : typeof user.displayName === "string"
+                        ? user.displayName
+                        : "Unknown User"}
                     </p>
                     <p className="text-xs text-gray-500 line-clamp-1">
-                      {user.email}
+                      {typeof user.email === "object" && user.email?.email
+                        ? user.email.email
+                        : typeof user.email === "string"
+                        ? user.email
+                        : "No email"}
                     </p>
                   </div>
                   {user.isPremium && (

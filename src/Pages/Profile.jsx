@@ -319,10 +319,34 @@ const Profile = () => {
               </div>
             ) : (
               <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
                   {user?.displayName || "Anonymous User"}
+                  {user?.isPremium && (
+                    <span className="text-base px-4 py-1 bg-yellow-100 text-yellow-800 rounded-full font-semibold flex items-center gap-1">
+                      ⭐ Premium
+                    </span>
+                  )}
                 </h1>
                 <p className="text-gray-600">Citizen Account</p>
+
+                {/* Blocked User Warning */}
+                {user?.isBlocked && (
+                  <div className="mt-4 bg-red-50 border-l-4 border-red-500 p-4">
+                    <div className="flex items-start">
+                      <HiX className="w-5 h-5 text-red-500 mt-0.5" />
+                      <div className="ml-3">
+                        <h3 className="text-sm font-bold text-red-800">
+                          Account Blocked
+                        </h3>
+                        <p className="text-sm text-red-700 mt-1">
+                          Your account has been blocked by the administrator.
+                          You cannot submit, edit, upvote, or boost issues.
+                          Please contact the authorities for more information.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -449,8 +473,17 @@ const Profile = () => {
 
       {/* Payment Modal */}
       {showPaymentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              setShowPaymentModal(false);
+              setClientSecret("");
+            }}
+          ></div>
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-lg max-w-md w-full p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
                 Upgrade to Premium

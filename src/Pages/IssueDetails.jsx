@@ -269,7 +269,12 @@ const IssueDetails = () => {
                 Reported By
               </h3>
               <p className="text-gray-700">
-                {issue.citizenName || "Anonymous Citizen"}
+                {typeof issue.citizenName === "object" &&
+                issue.citizenName?.name
+                  ? issue.citizenName.name
+                  : typeof issue.citizenName === "string"
+                  ? issue.citizenName
+                  : "Anonymous Citizen"}
               </p>
             </div>
 
@@ -281,14 +286,36 @@ const IssueDetails = () => {
                 </h3>
                 <div className="flex items-center gap-2">
                   <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {issue.assignedStaffName?.charAt(0).toUpperCase() || "S"}
+                    {(typeof issue.assignedStaffName === "string"
+                      ? issue.assignedStaffName
+                      : issue.assignedStaffName?.name || "S"
+                    )
+                      ?.charAt(0)
+                      .toUpperCase() || "S"}
                   </div>
                   <div>
                     <p className="text-gray-900 font-medium">
-                      {issue.assignedStaffName || issue.assignedStaff}
+                      {typeof issue.assignedStaffName === "object" &&
+                      issue.assignedStaffName?.name
+                        ? issue.assignedStaffName.name
+                        : typeof issue.assignedStaffName === "string"
+                        ? issue.assignedStaffName
+                        : typeof issue.assignedStaff === "object" &&
+                          issue.assignedStaff?.name
+                        ? issue.assignedStaff.name
+                        : typeof issue.assignedStaff === "string"
+                        ? issue.assignedStaff
+                        : "Staff Member"}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {issue.assignedStaff}
+                      {typeof issue.assignedStaff === "object" &&
+                      issue.assignedStaff?.email
+                        ? issue.assignedStaff.email
+                        : typeof issue.assignedStaff === "string"
+                        ? issue.assignedStaff
+                        : typeof issue.assignedTo === "string"
+                        ? issue.assignedTo
+                        : "No email"}
                     </p>
                   </div>
                 </div>
@@ -338,7 +365,13 @@ const IssueDetails = () => {
                           </div>
                           <p className="text-gray-700">{event.message}</p>
                           <p className="text-sm text-gray-500 mt-1">
-                            Updated by: {event.updatedBy}
+                            Updated by:{" "}
+                            {typeof event.updatedBy === "object" &&
+                            event.updatedBy?.name
+                              ? event.updatedBy.name
+                              : typeof event.updatedBy === "string"
+                              ? event.updatedBy
+                              : "Unknown"}
                           </p>
                         </div>
                       </div>

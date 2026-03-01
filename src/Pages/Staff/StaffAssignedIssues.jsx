@@ -34,7 +34,14 @@ const StaffAssignedIssues = () => {
         }
       );
 
-      setIssues(response.data);
+      // Sort: boosted issues first
+      const sortedIssues = (response.data || []).sort((a, b) => {
+        if (a.isBoosted && !b.isBoosted) return -1;
+        if (!a.isBoosted && b.isBoosted) return 1;
+        return 0;
+      });
+
+      setIssues(sortedIssues);
     } catch (error) {
       console.error("Error fetching issues:", error);
     } finally {
@@ -51,7 +58,7 @@ const StaffAssignedIssues = () => {
 
       await axios.patch(
         `https://citywatch-server.vercel.app/staff/issues/${issueId}/status`,
-        { status: newStatus, message: `Status changed to ${newStatus}` },
+        { status: newStatus, note: `Status changed to ${newStatus}` },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

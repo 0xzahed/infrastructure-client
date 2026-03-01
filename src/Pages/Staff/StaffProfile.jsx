@@ -8,7 +8,7 @@ const StaffProfile = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    displayName: "",
+    name: "",
     phoneNumber: "",
     photoURL: "",
   });
@@ -16,7 +16,7 @@ const StaffProfile = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        displayName: user.displayName || "",
+        name: user.displayName || "",
         phoneNumber: user.phoneNumber || "",
         photoURL: user.photoURL || "",
       });
@@ -109,9 +109,9 @@ const StaffProfile = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.displayName}
+                    value={formData.name}
                     onChange={(e) =>
-                      setFormData({ ...formData, displayName: e.target.value })
+                      setFormData({ ...formData, name: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                     placeholder="Enter your full name"

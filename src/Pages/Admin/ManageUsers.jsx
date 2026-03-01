@@ -30,7 +30,7 @@ const ManageUsers = () => {
     }
   };
 
-  const handleBlockUnblock = async (userId, currentStatus) => {
+  const handleBlockUnblock = async (userEmail, currentStatus) => {
     const action = currentStatus ? "unblock" : "block";
     if (!window.confirm(`Are you sure you want to ${action} this user?`)) {
       return;
@@ -39,8 +39,8 @@ const ManageUsers = () => {
     try {
       const token = localStorage.getItem("authToken");
       await axios.patch(
-        `https://citywatch-server.vercel.app/admin/users/${userId}/${action}`,
-        {},
+        `https://citywatch-server.vercel.app/admin/users/${userEmail}/status`,
+        { isBlocked: !currentStatus },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -120,7 +120,12 @@ const ManageUsers = () => {
                       />
                       <div>
                         <p className="font-semibold text-gray-800 flex items-center gap-2">
-                          {user.displayName}
+                          {typeof user.displayName === "object" &&
+                          user.displayName?.name
+                            ? user.displayName.name
+                            : typeof user.displayName === "string"
+                            ? user.displayName
+                            : "Unknown User"}
                           {user.isPremium && (
                             <HiStar className="w-4 h-4 text-yellow-500" />
                           )}
@@ -132,7 +137,11 @@ const ManageUsers = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {user.email}
+                    {typeof user.email === "object" && user.email?.email
+                      ? user.email.email
+                      : typeof user.email === "string"
+                      ? user.email
+                      : "No email"}
                   </td>
                   <td className="px-6 py-4">
                     {user.isPremium ? (
@@ -174,7 +183,7 @@ const ManageUsers = () => {
                   <td className="px-6 py-4">
                     <button
                       onClick={() =>
-                        handleBlockUnblock(user._id, user.isBlocked)
+                        handleBlockUnblock(user.email, user.isBlocked)
                       }
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
                         user.isBlocked
